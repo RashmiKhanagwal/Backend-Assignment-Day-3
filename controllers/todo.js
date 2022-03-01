@@ -13,7 +13,7 @@ module.exports.createTodo = async (req, res) => {
     }
 };
 
-// GET all todos
+// GET all todos for that User --- Day3
 module.exports.getAllTodo = async (req, res) => {
   try {
     const todos = await Todo.find(req.params.id);
@@ -22,6 +22,19 @@ module.exports.getAllTodo = async (req, res) => {
     res.status(500).json(err);
   }
 };
+
+//controller for admin to show all todos
+module.exports.getAdminTodo = async (req, res) =>{
+  await Todo.find().populate('userId', 'userName')
+  .then((todos) =>{
+      res.status(200).json(todos)
+  })
+  .catch((error)=>{
+      res.status(500).json({message:error.message})
+  })
+  
+};
+
 
 //GET one TODO 
 module.exports.getOneTodo = async (req, res) => {
@@ -123,4 +136,17 @@ module.exports.todoDone = async (req,res)=>{
     } catch (err){
         res.status(500).json(err);
     }
+};
+
+// Day 3  User with Admin role should be able to get all Todos
+
+module.exports.todoDonebyAdmin = async (req, res) =>{
+  const id = req.params.id
+  await Todo.updateOne({_id : {$eq:id}},{status : "Done"})
+  .then((todo)=>{
+      res.status(200).json({message : "Status updated to Done"})
+  })
+  .catch(err =>{
+      res.status(500).json({message : err.message})
+  })
 };
